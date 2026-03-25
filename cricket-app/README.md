@@ -123,14 +123,3 @@ cricket-app/
    - Swaps between ODI, T20, and Test formats to evaluate historical impact.
 
 ---
-
-### Security & Optimization
-
-- **Secure Environment**: API tokens are never hardcoded; they are managed via `.env` files and referenced through Vite's environment system.
-- **API Proxying**: Implements a Vite proxy (`/api`) to resolve CORS issues and keep requests secure during development.
-- **XSS Prevention**: Uses standard React JSX rendering which sanitizes data by default before injecting it into the DOM.
-- **DRY Code**: By isolating flag logic and math into `helpers.js`, we prevent logic drifting and ensure a single source of truth for calculations.
-
----
-
-© 2024 SCOUT HUB | THE DIGITAL CURATOR
