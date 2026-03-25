@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPlayers, fetchCountries } from '../api/sportmonks';
@@ -16,7 +16,7 @@ export default function ComparePage({ isMobileMenuOpen }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Load the full player set for searchable autocomplete
-  const { data: players = [], isLoading: pLoading } = useQuery({ queryKey: ['players'], queryFn: fetchPlayers });
+  const { data: players = [] } = useQuery({ queryKey: ['players'], queryFn: fetchPlayers });
   const { data: countries = [] } = useQuery({ queryKey: ['countries'], queryFn: fetchCountries });
 
   const initialP1 = searchParams.get('p1') || '';
@@ -35,13 +35,9 @@ export default function ComparePage({ isMobileMenuOpen }) {
    * Selection Sync:
    * Keep the search input text synchronized with the selected player's full name.
    */
-  useEffect(() => {
-    if (p1) setP1Search(p1.fullname);
-  }, [p1]);
-
-  useEffect(() => {
-    if (p2) setP2Search(p2.fullname);
-  }, [p2]);
+  // Sync input strings only if they're empty and we have valid खिलाड़ी data.
+  if (p1 && !p1Search) setP1Search(p1.fullname);
+  if (p2 && !p2Search) setP2Search(p2.fullname);
 
   /**
    * Logic to handle Player 1 selection via searchable datalist.

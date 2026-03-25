@@ -4,16 +4,14 @@
 
 **Scout Hub** is a high-performance scouting intelligence dashboard designed for professional cricket analysts and talent scouts. It provides a premium, data-driven environment for exploring global player rosters, conducting head-to-head technical comparisons, and deep-diving into individual career trajectories.
 
-Built with a focus on speed, precision, and visual excellence, the application demonstrates advanced React patterns, client-side data orchestration, and custom Bento-grid architectures.
-
 ---
 
 ### Core Functionality
 
-- **Elite Roster Filtering**: A multi-dimensional filtering engine allowing scouts to slice the global player database by country, position, and tournament with real-time debounced searching.
+- **Roster Filtering**: A multi-dimensional filtering engine allowing scouts to slice the global player database by country, position, and tournament with real-time debounced searching.
 - **Head-to-Head Comparison**: A dedicated comparison engine that calculates "Match Signatures" and "Consistency Indexes" between two players using visual clustering and relative delta math.
 - **Technical Dossier**: Individual player pages featuring multi-format career switchers (T20, ODI, Test) and performance vitals.
-- **Premium Fluid UI**: A responsive, dark-mode interface built entirely with Vanilla CSS, featuring custom glassmorphism effects and micro-animations.
+- **Fluid UI**: A responsive, dark-mode interface built entirely with Vanilla CSS, featuring custom glassmorphism effects and micro-animations.
 - **Hybrid Data Caching**: Implements `TanStack Query` for intelligent background fetching and state persistence, ensuring near-instant navigation between views.
 - **Scout Intelligence**: Automated "Scout Pick" logic that identifies the statistical leader in specific metrics during live comparisons.
 
@@ -123,14 +121,3 @@ cricket-app/
    - Swaps between ODI, T20, and Test formats to evaluate historical impact.
 
 ---
-
-### Security & Optimization
-
-- **Secure Environment**: API tokens are never hardcoded; they are managed via `.env` files and referenced through Vite's environment system.
-- **API Proxying**: Implements a Vite proxy (`/api`) to resolve CORS issues and keep requests secure during development.
-- **XSS Prevention**: Uses standard React JSX rendering which sanitizes data by default before injecting it into the DOM.
-- **DRY Code**: By isolating flag logic and math into `helpers.js`, we prevent logic drifting and ensure a single source of truth for calculations.
-
----
-
-© 2024 SCOUT HUB | THE DIGITAL CURATOR
