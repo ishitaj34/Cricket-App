@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { fetchPlayers, fetchCountries, fetchPositions } from '../api/sportmonks';
+import { fetchPlayers, fetchCountries } from '../api/sportmonks';
 import PlayerCard from '../components/PlayerCard';
 import Loader from '../components/Loader';
 
@@ -87,14 +87,6 @@ export default function PlayersListingPage({ isMobileMenuOpen }) {
     setSearchParams(params);
   };
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    const params = new URLSearchParams(searchParams);
-    if (searchInput) params.set('search', searchInput);
-    else params.delete('search');
-    params.delete('page');
-    setSearchParams(params);
-  };
 
   /**
    * Processes the raw dataset based on four concurrent criteria:
@@ -160,8 +152,8 @@ export default function PlayersListingPage({ isMobileMenuOpen }) {
     <div className="listing-layout">
       {/* SideNavBar / Filter Shell */}
       <aside className={`sidebar custom-scrollbar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-        <div>
-          <h3 className="sidebar-title">Scout Hub Filters</h3>
+        <div className="sidebar-filters-container">
+          <h3 className="sidebar-title" style={{ padding: '0 24px', fontSize: '0.625rem' }}>Scout Hub Filters</h3>
           <div className="sidebar-filters">
             {/* Search Input */}
             <div className="filter-group">
@@ -242,17 +234,14 @@ export default function PlayersListingPage({ isMobileMenuOpen }) {
         </div>
 
         {/* SideNav Hubs */}
-        <nav className="sidebar-nav">
-          <Link to="/" className="sidebar-link active">
+        <nav className="nav-list sidebar-nav">
+          <Link to="/" className="nav-item active">
             <span className="material-symbols-outlined">radar</span> Scouting Hub
           </Link>
-          <Link to="/compare" className="sidebar-link">
+          <Link to="/compare" className="nav-item">
             <span className="material-symbols-outlined">compare_arrows</span> Head-to-Head
           </Link>
-          <div
-            className="sidebar-link disabled"
-            style={{ opacity: 0.3, pointerEvents: 'none', cursor: 'default' }}
-          >
+          <div className="nav-item disabled" style={{ opacity: 0.3 }}>
             <span className="material-symbols-outlined">analytics</span> Analytics (Soon)
           </div>
         </nav>

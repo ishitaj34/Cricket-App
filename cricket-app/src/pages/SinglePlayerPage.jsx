@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPlayers, fetchCountries } from '../api/sportmonks';
@@ -23,6 +23,13 @@ export default function SinglePlayerPage() {
 
   const player = players.find((p) => p.id === parseInt(id));
   const country = countries.find((c) => c.id === player?.country_id);
+
+  // Use a deterministic "random" rank based on player ID to satisfy React purity rules.
+  const worldRank = useMemo(() => {
+    if (!player?.id) return 1;
+    // Simple hash: (ID * some prime) % range + 1
+    return ((player.id * 31) % 50) + 1;
+  }, [player?.id]);
 
   if (pLoading) return <Loader text="Loading Pitch Data..." />;
 
@@ -91,7 +98,7 @@ export default function SinglePlayerPage() {
                 className="sp-player-img"
                 src={imgPath}
                 onError={(e) => {
-                  e.target.src = fallbackImg;
+                  e.target.src = FALLBACK_IMAGE;
                 }}
               />
             </div>
@@ -128,7 +135,7 @@ export default function SinglePlayerPage() {
                 >
                   star
                 </span>
-                <span className="text-white">World Rank #{Math.floor(Math.random() * 50) + 1}</span>
+                <span className="text-white">World Rank #{worldRank}</span>
               </div>
             </div>
           </div>

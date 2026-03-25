@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Link, useSearchParams } from 'react-router-dom';
 import PlayersListingPage from './pages/PlayersListingPage';
 import SinglePlayerPage from './pages/SinglePlayerPage';
@@ -54,18 +54,19 @@ function AppContent() {
           <div className="nav-actions">
             <button
               title="Toggle Scouting Filters"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={() => isListingRoute && setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="material-symbols-outlined icon-btn"
               style={{ 
-                opacity: (isListingRoute || isCompareRoute) ? 1 : 0.4,
-                color: isMobileMenuOpen ? 'var(--primary)' : 'inherit'
+                opacity: isListingRoute ? 1 : 0.4,
+                cursor: isListingRoute ? 'pointer' : 'default',
+                color: (isListingRoute && isMobileMenuOpen) ? 'var(--primary)' : 'inherit'
               }}
             >
               filter_list
             </button>
             <button
               title="Toggle Alphabetical Sort"
-              onClick={() => toggleSort('firstname')}
+              onClick={() => isListingRoute && toggleSort('firstname')}
               className="material-symbols-outlined icon-btn"
               style={{
                 opacity: isListingRoute ? 1 : 0.4,
