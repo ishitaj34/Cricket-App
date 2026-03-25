@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPlayers, fetchCountries } from '../api/sportmonks';
@@ -32,12 +32,19 @@ export default function ComparePage({ isMobileMenuOpen }) {
   const p2 = players.find((p) => p.id.toString() === playerTwoId) || players[1] || players[0];
 
   /**
-   * Selection Sync:
-   * Keep the search input text synchronized with the selected player's full name.
+   * Selection Sync: 
+   * We only update the search text when the actual player ID changes 
+   * (e.g., when the user selects a new player from the search results).
+   * This prevents the search bar from resetting when the user is trying 
+   * to delete characters to search for someone else.
    */
-  // Sync input strings only if they're empty and we have valid खिलाड़ी data.
-  if (p1 && !p1Search) setP1Search(p1.fullname);
-  if (p2 && !p2Search) setP2Search(p2.fullname);
+  useEffect(() => {
+    if (p1) setP1Search(p1.fullname);
+  }, [p1?.id]);
+
+  useEffect(() => {
+    if (p2) setP2Search(p2.fullname);
+  }, [p2?.id]);
 
   /**
    * Logic to handle Player 1 selection via searchable datalist.
