@@ -16,8 +16,8 @@ import axios from 'axios';
 const isDev = import.meta.env.DEV;
 
 /**
- * Both Vite (dev) and Vercel (prod) proxies are now configured 
- * to inject the API token on the server-side. The client 
+ * Both Vite (dev) and Vercel (prod) proxies are now configured
+ * to inject the API token on the server-side. The client
  * never needs to know or touch the token.
  */
 const apiClient = axios.create({

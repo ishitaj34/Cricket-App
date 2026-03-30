@@ -3,7 +3,12 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import { fetchPlayers, fetchCountries } from '../api/sportmonks';
-import { FALLBACK_IMAGE, getFlagEmoji, getPercentDiff, getTotalCareerStats } from '../utils/helpers';
+import {
+  FALLBACK_IMAGE,
+  getFlagEmoji,
+  getPercentDiff,
+  getTotalCareerStats,
+} from '../utils/helpers';
 import Loader from '../components/Loader';
 
 /**
@@ -169,18 +174,30 @@ export default function ComparePage({ isMobileMenuOpen }) {
                 {/* Player One */}
                 <div className="player-col">
                   <div className="player-select">
-                    <input list="players-list-p1" placeholder="Search Player 1..." value={p1Search} onChange={handleP1Change} />
+                    <input
+                      list="players-list-p1"
+                      placeholder="Search Player 1..."
+                      value={p1Search}
+                      onChange={handleP1Change}
+                    />
                     <span className="material-symbols-outlined">search</span>
                   </div>
                   <div className="compare-player-card">
-                    <img alt={p1.fullname} className="player-img" src={p1.image_path || FALLBACK_IMAGE} onError={(e) => (e.target.src = FALLBACK_IMAGE)} />
+                    <img
+                      alt={p1.fullname}
+                      className="player-img"
+                      src={p1.image_path || FALLBACK_IMAGE}
+                      onError={(e) => (e.target.src = FALLBACK_IMAGE)}
+                    />
                     <div className="player-card-content">
                       <div className="player-info">
                         <p>{getCountry(p1.country_id)}</p>
                         <h3>{p1.fullname}</h3>
                       </div>
                       <div className="flag-box">
-                        <span className="flag-icon flag-icon-lg">{getFlagEmoji(getCountry(p1.country_id))}</span>
+                        <span className="flag-icon flag-icon-lg">
+                          {getFlagEmoji(getCountry(p1.country_id))}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -194,9 +211,17 @@ export default function ComparePage({ isMobileMenuOpen }) {
                   <div className="glass-table">
                     {comparisonRows.map((row, j) => (
                       <div className="metric-row" key={j}>
-                        <div className={`metric-val ${parseFloat(row.val1) > parseFloat(row.val2) ? 'winner' : ''}`}>{row.val1}</div>
+                        <div
+                          className={`metric-val ${parseFloat(row.val1) > parseFloat(row.val2) ? 'winner' : ''}`}
+                        >
+                          {row.val1}
+                        </div>
                         <div className="metric-label">{row.label}</div>
-                        <div className={`metric-val ${parseFloat(row.val2) > parseFloat(row.val1) ? 'winner' : ''}`}>{row.val2}</div>
+                        <div
+                          className={`metric-val ${parseFloat(row.val2) > parseFloat(row.val1) ? 'winner' : ''}`}
+                        >
+                          {row.val2}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -205,18 +230,30 @@ export default function ComparePage({ isMobileMenuOpen }) {
                 {/* Player Two */}
                 <div className="player-col">
                   <div className="player-select">
-                    <input list="players-list-p2" placeholder="Search Player 2..." value={p2Search} onChange={handleP2Change} />
+                    <input
+                      list="players-list-p2"
+                      placeholder="Search Player 2..."
+                      value={p2Search}
+                      onChange={handleP2Change}
+                    />
                     <span className="material-symbols-outlined">search</span>
                   </div>
                   <div className="compare-player-card">
-                    <img alt={p2.fullname} className="player-img" src={p2.image_path || FALLBACK_IMAGE} onError={(e) => (e.target.src = FALLBACK_IMAGE)} />
+                    <img
+                      alt={p2.fullname}
+                      className="player-img"
+                      src={p2.image_path || FALLBACK_IMAGE}
+                      onError={(e) => (e.target.src = FALLBACK_IMAGE)}
+                    />
                     <div className="player-card-content">
                       <div className="player-info">
                         <p>{getCountry(p2.country_id)}</p>
                         <h3>{p2.fullname}</h3>
                       </div>
                       <div className="flag-box">
-                        <span className="flag-icon flag-icon-lg">{getFlagEmoji(getCountry(p2.country_id))}</span>
+                        <span className="flag-icon flag-icon-lg">
+                          {getFlagEmoji(getCountry(p2.country_id))}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -225,10 +262,14 @@ export default function ComparePage({ isMobileMenuOpen }) {
 
               {/* Filtered datalists: only show relevant matches, not the entire roster */}
               <datalist id="players-list-p1">
-                {filteredP1Options.map((p) => <option key={p.id} value={p.fullname} />)}
+                {filteredP1Options.map((p) => (
+                  <option key={p.id} value={p.fullname} />
+                ))}
               </datalist>
               <datalist id="players-list-p2">
-                {filteredP2Options.map((p) => <option key={p.id} value={p.fullname} />)}
+                {filteredP2Options.map((p) => (
+                  <option key={p.id} value={p.fullname} />
+                ))}
               </datalist>
 
               {/* Advanced Insights Grid */}
@@ -268,19 +309,18 @@ function InsightsGrid({ p1, p2 }) {
         <div className="heatmap-header">
           <h4>Impact Heatmap</h4>
           <span className="badge-timer">
-            Analysis Index: {((parseInt(p1?.id || 0) + parseInt(p2?.id || 0)) % 100).toFixed(0)}% Match
+            Analysis Index: {((parseInt(p1?.id || 0) + parseInt(p2?.id || 0)) % 100).toFixed(0)}%
+            Match
           </span>
         </div>
         <div className="heatmap-content">
           <div className="heatmap-grid compare-heatmap-grid">
             {[...Array(72)].map((_, i) => {
-              const seed = (parseInt(p1?.id || 0) * (i + 1) + parseInt(p2?.id || 0) * (i + 3)) % 100;
+              const seed =
+                (parseInt(p1?.id || 0) * (i + 1) + parseInt(p2?.id || 0) * (i + 3)) % 100;
               const isHot = seed > 85;
               return (
-                <div
-                  key={i}
-                  className={`heatmap-dot ${isHot ? 'heatmap-dot-hot' : ''}`}
-                ></div>
+                <div key={i} className={`heatmap-dot ${isHot ? 'heatmap-dot-hot' : ''}`}></div>
               );
             })}
           </div>
@@ -295,7 +335,8 @@ function InsightsGrid({ p1, p2 }) {
           </div>
           <h5>{srLeader.lastname} leads in Power Impact.</h5>
           <p className="summary-desc">
-            Analyzing recent delivery trajectories, {srLeader.lastname} maintains a {Math.max(sr1, sr2)} S/R advantage in powerplay scenarios.
+            Analyzing recent delivery trajectories, {srLeader.lastname} maintains a{' '}
+            {Math.max(sr1, sr2)} S/R advantage in powerplay scenarios.
           </p>
         </div>
         <div className="consistency-card">
@@ -303,7 +344,9 @@ function InsightsGrid({ p1, p2 }) {
             <span className="material-symbols-outlined">trending_up</span>
             <div>
               <p>Consistency Index</p>
-              <p>{avgLeader.lastname} +{getPercentDiff(avg1, avg2)}%</p>
+              <p>
+                {avgLeader.lastname} +{getPercentDiff(avg1, avg2)}%
+              </p>
             </div>
           </div>
           <p className="consistency-desc">

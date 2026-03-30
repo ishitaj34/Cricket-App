@@ -54,7 +54,9 @@ function AppContent() {
           <div className="footer-links">
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Scouting</a>
-            <a href="https://sportmonks.com/cricket-api/" target="_blank" rel="noopener noreferrer">Data API</a>
+            <a href="https://sportmonks.com/cricket-api/" target="_blank" rel="noopener noreferrer">
+              Data API
+            </a>
           </div>
         </footer>
       )}

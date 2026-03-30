@@ -69,11 +69,7 @@ export default function SinglePlayerPage() {
       <section className="sp-hero">
         <div className="sp-hero-bg">
           <div className="sp-hero-overlay"></div>
-          <img
-            alt="Stadium"
-            className="sp-hero-img-bg"
-            src={STADIUM_HERO}
-          />
+          <img alt="Stadium" className="sp-hero-img-bg" src={STADIUM_HERO} />
         </div>
         <div className="sp-hero-content">
           <div className="sp-player-badge">
@@ -94,9 +90,7 @@ export default function SinglePlayerPage() {
               <span className="sp-tag-elite">Elite Professional</span>
               {country && (
                 <div className="sp-tag-country">
-                  <span className="material-symbols-outlined sp-tag-country-icon">
-                    public
-                  </span>
+                  <span className="material-symbols-outlined sp-tag-country-icon">public</span>
                   {country.name}
                 </div>
               )}
@@ -111,9 +105,7 @@ export default function SinglePlayerPage() {
                 <span>{player.position?.name || 'Player'}</span>
               </div>
               <div className="sp-meta-item">
-                <span className="material-symbols-outlined sp-star-filled">
-                  star
-                </span>
+                <span className="material-symbols-outlined sp-star-filled">star</span>
                 <span className="text-white">World Rank #{worldRank}</span>
               </div>
             </div>
@@ -183,9 +175,7 @@ export default function SinglePlayerPage() {
               </div>
             </div>
 
-            {activeCareer && (
-              <CareerBentoGrid activeCareer={activeCareer} player={player} />
-            )}
+            {activeCareer && <CareerBentoGrid activeCareer={activeCareer} player={player} />}
           </section>
         )}
       </div>
@@ -197,8 +187,7 @@ export default function SinglePlayerPage() {
  * Extracted Career Bento Grid component.
  */
 function CareerBentoGrid({ activeCareer, player }) {
-  const matches =
-    activeCareer.batting?.matches || activeCareer.bowling?.matches || '-';
+  const matches = activeCareer.batting?.matches || activeCareer.bowling?.matches || '-';
   const runs = activeCareer.batting?.runs_scored || '-';
   const sr = activeCareer.batting?.strike_rate || '0.0';
   const avg = activeCareer.batting?.average || '0.0';
@@ -209,9 +198,7 @@ function CareerBentoGrid({ activeCareer, player }) {
       {/* Total Matches */}
       <div className="bento-item col-3">
         <div className="stat-card-header">
-          <span className="material-symbols-outlined stat-icon-muted">
-            stadium
-          </span>
+          <span className="material-symbols-outlined stat-icon-muted">stadium</span>
         </div>
         <p className="stat-val-huge">{matches}</p>
         <p className="stat-desc">Total Matches Played</p>
@@ -239,17 +226,11 @@ function CareerBentoGrid({ activeCareer, player }) {
       {/* Highest Score */}
       <div className="bento-item col-3 highest-score-card">
         <div>
-          <span className="material-symbols-outlined highest-score-icon">
-            workspace_premium
-          </span>
+          <span className="material-symbols-outlined highest-score-icon">workspace_premium</span>
           <p className="stat-val-huge">{highest}</p>
-          <p className="stat-desc">
-            {activeCareer.bowling ? 'Wickets' : 'Highest Score'}
-          </p>
+          <p className="stat-desc">{activeCareer.bowling ? 'Wickets' : 'Highest Score'}</p>
         </div>
-        <div className="highest-score-footer">
-          Season {activeCareer.season_id}
-        </div>
+        <div className="highest-score-footer">Season {activeCareer.season_id}</div>
       </div>
 
       {/* Scoring Heatmap (Dynamic) */}
@@ -276,9 +257,7 @@ function CareerBentoGrid({ activeCareer, player }) {
       {/* Scouting Report Notice (Export removed — window.print is not a proper PDF solution) */}
       <div className="bento-item col-4 download-box">
         <div className="download-icon">
-          <span className="material-symbols-outlined download-icon-lg">
-            download
-          </span>
+          <span className="material-symbols-outlined download-icon-lg">download</span>
         </div>
         <h4>Scouting Report</h4>
         <p>

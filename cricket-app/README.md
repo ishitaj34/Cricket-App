@@ -19,14 +19,14 @@
 
 ### Terminology Used
 
-| Term | Definition |
-|------|-----------|
-| **Hub-and-Spoke Navigation** | A layout strategy using a fixed sidebar for global hubs (Roster, Compare) and a main section for contextual actions. |
-| **Match Signature** | A dynamic visual heatmap generated based on player metadata to represent their technical footprint. |
-| **Consistency Index** | A calculated percentage difference between players, providing a quick sanity check for statistical leads. |
-| **Scout Pick** | An automated highlighting system that identifies the superior performer in a head-to-head pairing. |
-| **Hydration** | The process of mapping raw API ID references (Country ID, Position ID) to their readable metadata via cached lookups. |
-| **Bento Grid** | A modern tiling layout strategy used for the player roster and dashboard components. |
+| Term                         | Definition                                                                                                            |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Hub-and-Spoke Navigation** | A layout strategy using a fixed sidebar for global hubs (Roster, Compare) and a main section for contextual actions.  |
+| **Match Signature**          | A dynamic visual heatmap generated based on player metadata to represent their technical footprint.                   |
+| **Consistency Index**        | A calculated percentage difference between players, providing a quick sanity check for statistical leads.             |
+| **Scout Pick**               | An automated highlighting system that identifies the superior performer in a head-to-head pairing.                    |
+| **Hydration**                | The process of mapping raw API ID references (Country ID, Position ID) to their readable metadata via cached lookups. |
+| **Bento Grid**               | A modern tiling layout strategy used for the player roster and dashboard components.                                  |
 
 ---
 
@@ -37,14 +37,14 @@
 - **Styling:** Vanilla CSS3 (Custom Design System with CSS Variables)
 - **API:** SportMonks Cricket API (v2)
 - **Routing:** React Router 6 (URL-driven state management)
-- **Architecture:** 
-    - **Functional Components**: Clean, hook-based logic.
-    - **DRY Utility System**: Centralized helper functions for math and formatting.
-    - **Debounced Engines**: Optimized search to prevent API throttling.
+- **Architecture:**
+  - **Functional Components**: Clean, hook-based logic.
+  - **DRY Utility System**: Centralized helper functions for math and formatting.
+  - **Debounced Engines**: Optimized search to prevent API throttling.
 - **Performance:**
-    - Zero external UI libraries (Maximum performance/minimal bundle size).
-    - Memoized data processing for large-scale filtering.
-    - Custom responsive "drawer" navigation for mobile devices.
+  - Zero external UI libraries (Maximum performance/minimal bundle size).
+  - Memoized data processing for large-scale filtering.
+  - Custom responsive "drawer" navigation for mobile devices.
 
 ---
 
@@ -80,27 +80,27 @@ cricket-app/
 ### Code Navigation Guide
 
 1. **API Orchestration**
-   *File:* `src/api/sportmonks.js`
+   _File:_ `src/api/sportmonks.js`
    - Handles all async communication with the data provider.
    - Implements standardized data structures for easy consumption across components.
 
 2. **Filtering Engine & Roster**
-   *File:* `src/pages/PlayersListingPage.jsx`
+   _File:_ `src/pages/PlayersListingPage.jsx`
    - Manages the complex intersection of search, dropdown filters, and URL-driven state.
    - Loads and maps country/position metadata to ensure readable labels.
 
 3. **Comparison Intelligence**
-   *File:* `src/pages/ComparePage.jsx`
+   _File:_ `src/pages/ComparePage.jsx`
    - Orchestrates the dual-lookup player selection.
    - Calculates the **Consistency Index** using central helpers to determine statistical leaders.
 
 4. **Shared Utilities (DRY)**
-   *File:* `src/utils/helpers.js`
+   _File:_ `src/utils/helpers.js`
    - Centralizes image fallbacks, flag emoji mapping, and delta-math.
    - Ensures consistency in formatting across the Roster and Dossier pages.
 
 5. **Responsive Design System**
-   *File:* `src/App.css`
+   _File:_ `src/App.css`
    - Implements the "Modern Dark" design system.
    - Handles the complex Mobile Drawer transition and responsive grid breakpoints (1024px, 768px).
 

@@ -8,10 +8,7 @@
 export default async function handler(req, res) {
   try {
     const forwardPath = req.url.replace(/^\/api-proxy/, '');
-    const url = new URL(
-      forwardPath,
-      'https://cricket.sportmonks.com/api/v2.0'
-    );
+    const url = new URL(forwardPath, 'https://cricket.sportmonks.com/api/v2.0');
 
     // Inject the server-only token
     url.searchParams.set('api_token', process.env.SPORTMONKS_API_TOKEN);

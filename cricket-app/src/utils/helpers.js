@@ -12,29 +12,27 @@ export const STADIUM_HERO = '/stadium-hero.svg';
 export const getFlagEmoji = (countryName) => {
   // Map country names to ISO 3166-1 alpha-2 codes
   const countryCodeMap = {
-    'Australia': 'AU',
-    'India': 'IN',
-    'England': 'GB',
-    'Pakistan': 'PK',
+    Australia: 'AU',
+    India: 'IN',
+    England: 'GB',
+    Pakistan: 'PK',
     'New Zealand': 'NZ',
     'South Africa': 'ZA',
     'West Indies': 'JM',
     'Sri Lanka': 'LK',
-    'Bangladesh': 'BD',
-    'Afghanistan': 'AF',
-    'Ireland': 'IE',
-    'Zimbabwe': 'ZW',
-    'Scotland': 'GB',
-    'Netherlands': 'NL',
+    Bangladesh: 'BD',
+    Afghanistan: 'AF',
+    Ireland: 'IE',
+    Zimbabwe: 'ZW',
+    Scotland: 'GB',
+    Netherlands: 'NL',
   };
 
   const code = countryCodeMap[countryName];
   if (!code) return '\u{1F3F4}'; // default black flag
 
   // Convert country code to regional indicator symbols
-  return String.fromCodePoint(
-    ...code.split('').map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)
-  );
+  return String.fromCodePoint(...code.split('').map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
 };
 
 /**
@@ -107,9 +105,10 @@ export const aggregateCareerByType = (career) => {
         }
         const dismissals = agg.innings - agg.not_outs;
         agg.average = dismissals > 0 ? parseFloat((agg.runs_scored / dismissals).toFixed(2)) : 0;
-        agg.strike_rate = agg.balls_faced > 0
-          ? parseFloat(((agg.runs_scored / agg.balls_faced) * 100).toFixed(2))
-          : 0;
+        agg.strike_rate =
+          agg.balls_faced > 0
+            ? parseFloat(((agg.runs_scored / agg.balls_faced) * 100).toFixed(2))
+            : 0;
       }
     }
 
@@ -129,7 +128,8 @@ export const aggregateCareerByType = (career) => {
         // Recalculate derived bowling stats
         agg.average = agg.wickets > 0 ? parseFloat((agg.runs / agg.wickets).toFixed(2)) : 0;
         agg.econ_rate = agg.overs > 0 ? parseFloat((agg.runs / agg.overs).toFixed(2)) : 0;
-        agg.strike_rate = agg.wickets > 0 ? parseFloat(((agg.overs * 6) / agg.wickets).toFixed(2)) : 0;
+        agg.strike_rate =
+          agg.wickets > 0 ? parseFloat(((agg.overs * 6) / agg.wickets).toFixed(2)) : 0;
       }
     }
   });
@@ -180,9 +180,8 @@ export const getTotalCareerStats = (career) => {
 
   const dismissals = totalInnings - totalNotOuts;
   const average = dismissals > 0 ? parseFloat((totalRuns / dismissals).toFixed(2)) : 0;
-  const strikeRate = totalBallsFaced > 0
-    ? parseFloat(((totalRuns / totalBallsFaced) * 100).toFixed(2))
-    : 0;
+  const strikeRate =
+    totalBallsFaced > 0 ? parseFloat(((totalRuns / totalBallsFaced) * 100).toFixed(2)) : 0;
 
   return {
     matches: totalMatches,
