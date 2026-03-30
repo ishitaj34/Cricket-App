@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" fill="none">
+  <rect width="1200" height="520" fill="#0c0c0c"/>
+  
+  <!-- Stadium outline (lightened stroke) -->
+  <ellipse cx="600" cy="400" rx="500" ry="120" fill="none" stroke="#2a2a2a" stroke-width="2"/>
+  <ellipse cx="600" cy="380" rx="400" ry="100" fill="none" stroke="#252525" stroke-width="1.5"/>
+  
+  <!-- Pitch area (using secondary green accent) -->
+  <rect x="570" y="300" width="60" height="120" rx="4" fill="#1a3321"/>
+  
+  <!-- Floodlights (more visible) -->
+  <line x1="200" y1="100" x2="200" y2="280" stroke="#333" stroke-width="3"/>
+  <circle cx="200" cy="95" r="12" fill="#444"/>
+  <circle cx="200" cy="95" r="4" fill="#66bb6a" opacity="0.6"/> <!-- glowing indicator -->
+  
+  <line x1="1000" y1="100" x2="1000" y2="280" stroke="#333" stroke-width="3"/>
+  <circle cx="1000" cy="95" r="12" fill="#444"/>
+  <circle cx="1000" cy="95" r="4" fill="#66bb6a" opacity="0.6"/>
+  
+  <!-- Stands and audience (denser lines) -->
+  <path d="M100 350 Q600 150 1100 350" fill="none" stroke="#2a2a2a" stroke-width="2"/>
+  <path d="M50 380 Q600 120 1150 380" fill="none" stroke="#222" stroke-width="1" opacity="0.4"/>
+</svg>

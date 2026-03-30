@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import PropTypes from 'prop-types';
 import { fetchPlayers, fetchCountries } from '../api/sportmonks';
-import { FALLBACK_IMAGE, getFlagEmoji, getPercentDiff } from '../utils/helpers';
+import { FALLBACK_IMAGE, getFlagEmoji, getPercentDiff, getTotalCareerStats } from '../utils/helpers';
 import Loader from '../components/Loader';
 
 /**
  * Scout Hub: Head-to-Head Comparison Engine.
- * 
- * Allows users to select any two players from the roster and compare 
- * their statistics side-by-side using high-performance visual clusters 
+ *
+ * Allows users to select any two players from the roster and compare
+ * their statistics side-by-side using high-performance visual clusters
  * and a truth-based intelligence summary.
  */
 export default function ComparePage({ isMobileMenuOpen }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Load the full player set for searchable autocomplete
   const { data: players = [] } = useQuery({ queryKey: ['players'], queryFn: fetchPlayers });
   const { data: countries = [] } = useQuery({ queryKey: ['countries'], queryFn: fetchCountries });
 
@@ -32,24 +32,26 @@ export default function ComparePage({ isMobileMenuOpen }) {
   const p2 = players.find((p) => p.id.toString() === playerTwoId) || players[1] || players[0];
 
   /**
-   * Selection Sync: 
-   * We only update the search text when the actual player ID changes 
-   * (e.g., when the user selects a new player from the search results).
-   * This prevents the search bar from resetting when the user is trying 
-   * to delete characters to search for someone else.
+   * Selection Sync via refs instead of useEffect+setState.
+   * Refs track the previously synced player ID. When the player changes,
+   * we update the search text imperatively during render (no cascading effects).
    */
-  useEffect(() => {
-    if (p1) setP1Search(p1.fullname);
-  }, [p1?.id]);
+  const prevP1Id = useRef(null);
+  const prevP2Id = useRef(null);
 
-  useEffect(() => {
-    if (p2) setP2Search(p2.fullname);
-  }, [p2?.id]);
+  if (p1?.id !== prevP1Id.current) {
+    prevP1Id.current = p1?.id ?? null;
+    if (p1?.fullname && p1.fullname !== p1Search) {
+      setP1Search(p1.fullname);
+    }
+  }
+  if (p2?.id !== prevP2Id.current) {
+    prevP2Id.current = p2?.id ?? null;
+    if (p2?.fullname && p2.fullname !== p2Search) {
+      setP2Search(p2.fullname);
+    }
+  }
 
-  /**
-   * Logic to handle Player 1 selection via searchable datalist.
-   * Updates both local state and URL parameters for deep-linking.
-   */
   const handleP1Change = (e) => {
     const val = e.target.value;
     setP1Search(val);
@@ -77,7 +79,63 @@ export default function ComparePage({ isMobileMenuOpen }) {
     }
   };
 
+  /**
+   * Filter the datalist to show only the top 50 matches for the
+   * current search text, instead of dumping the entire roster (~1000+ items)
+   * into the DOM which causes browser lag and is a poor UX.
+   */
+  const filteredP1Options = useMemo(() => {
+    if (!p1Search || p1Search.length < 2) return players.slice(0, 50);
+    const q = p1Search.toLowerCase();
+    return players.filter((p) => p.fullname.toLowerCase().includes(q)).slice(0, 50);
+  }, [players, p1Search]);
+
+  const filteredP2Options = useMemo(() => {
+    if (!p2Search || p2Search.length < 2) return players.slice(0, 50);
+    const q = p2Search.toLowerCase();
+    return players.filter((p) => p.fullname.toLowerCase().includes(q)).slice(0, 50);
+  }, [players, p2Search]);
+
   const getCountry = (pid) => countries.find((c) => c.id === pid)?.name || 'Unknown';
+
+  /**
+   * Build comparison rows from real API data.
+   * Using `?? '-'` so that:
+   * - A player with 0 matches shows 0.
+   * - A player with missing data shows '-'.
+   */
+  const comparisonRows = useMemo(() => {
+    if (!p1 || !p2) return [];
+    const t1 = getTotalCareerStats(p1.career);
+    const t2 = getTotalCareerStats(p2.career);
+    return [
+      {
+        label: 'Matches',
+        val1: t1.matches || '-',
+        val2: t2.matches || '-',
+      },
+      {
+        label: 'Runs',
+        val1: t1.runs || '-',
+        val2: t2.runs || '-',
+      },
+      {
+        label: 'Average',
+        val1: t1.average || '-',
+        val2: t2.average || '-',
+      },
+      {
+        label: 'S/R',
+        val1: t1.strikeRate || '-',
+        val2: t2.strikeRate || '-',
+      },
+      {
+        label: 'Highest',
+        val1: t1.highest || '-',
+        val2: t2.highest || '-',
+      },
+    ];
+  }, [p1, p2]);
 
   return (
     <div className="compare-layout">
@@ -90,7 +148,7 @@ export default function ComparePage({ isMobileMenuOpen }) {
           <Link to="/compare" className="nav-item active">
             <span className="material-symbols-outlined">compare_arrows</span> Head-to-Head
           </Link>
-          <div className="nav-item disabled" style={{ opacity: 0.3 }}>
+          <div className="nav-item disabled">
             <span className="material-symbols-outlined">analytics</span> Analytics (Soon)
           </div>
         </nav>
@@ -107,12 +165,11 @@ export default function ComparePage({ isMobileMenuOpen }) {
             <Loader text="Analyzing Head-to-Head Metrics..." />
           ) : (
             <>
-              {/* Wrapped in comparison-grid to fix scaling and layout! */}
               <div className="comparison-grid">
                 {/* Player One */}
                 <div className="player-col">
                   <div className="player-select">
-                    <input list="players-list" placeholder="Search Player 1..." value={p1Search} onChange={handleP1Change} />
+                    <input list="players-list-p1" placeholder="Search Player 1..." value={p1Search} onChange={handleP1Change} />
                     <span className="material-symbols-outlined">search</span>
                   </div>
                   <div className="compare-player-card">
@@ -123,7 +180,7 @@ export default function ComparePage({ isMobileMenuOpen }) {
                         <h3>{p1.fullname}</h3>
                       </div>
                       <div className="flag-box">
-                        <span className="flag-icon" style={{ fontSize: '1.5rem' }}>{getFlagEmoji(getCountry(p1.country_id))}</span>
+                        <span className="flag-icon flag-icon-lg">{getFlagEmoji(getCountry(p1.country_id))}</span>
                       </div>
                     </div>
                   </div>
@@ -135,13 +192,7 @@ export default function ComparePage({ isMobileMenuOpen }) {
                     <span>Comparison Metrics</span>
                   </div>
                   <div className="glass-table">
-                    {[
-                      { label: 'Matches', val1: p1.career?.[0]?.batting?.matches || 115, val2: p2.career?.[0]?.batting?.matches || 132 },
-                      { label: 'Runs', val1: p1.career?.[0]?.batting?.runs_scored || 4520, val2: p2.career?.[0]?.batting?.runs_scored || 5120 },
-                      { label: 'Average', val1: p1.career?.[0]?.batting?.average || 42.5, val2: p2.career?.[0]?.batting?.average || 45.2 },
-                      { label: 'S/R', val1: p1.career?.[0]?.batting?.strike_rate || 132, val2: p2.career?.[0]?.batting?.strike_rate || 145 },
-                      { label: 'Highest', val1: p1.career?.[0]?.batting?.highest_score || 124, val2: p2.career?.[0]?.batting?.highest_score || 148 },
-                    ].map((row, j) => (
+                    {comparisonRows.map((row, j) => (
                       <div className="metric-row" key={j}>
                         <div className={`metric-val ${parseFloat(row.val1) > parseFloat(row.val2) ? 'winner' : ''}`}>{row.val1}</div>
                         <div className="metric-label">{row.label}</div>
@@ -154,7 +205,7 @@ export default function ComparePage({ isMobileMenuOpen }) {
                 {/* Player Two */}
                 <div className="player-col">
                   <div className="player-select">
-                    <input list="players-list" placeholder="Search Player 2..." value={p2Search} onChange={handleP2Change} />
+                    <input list="players-list-p2" placeholder="Search Player 2..." value={p2Search} onChange={handleP2Change} />
                     <span className="material-symbols-outlined">search</span>
                   </div>
                   <div className="compare-player-card">
@@ -165,82 +216,23 @@ export default function ComparePage({ isMobileMenuOpen }) {
                         <h3>{p2.fullname}</h3>
                       </div>
                       <div className="flag-box">
-                        <span className="flag-icon" style={{ fontSize: '1.5rem' }}>{getFlagEmoji(getCountry(p2.country_id))}</span>
+                        <span className="flag-icon flag-icon-lg">{getFlagEmoji(getCountry(p2.country_id))}</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <datalist id="players-list">
-                {players.map(p => <option key={p.id} value={p.fullname} />)}
+              {/* Filtered datalists: only show relevant matches, not the entire roster */}
+              <datalist id="players-list-p1">
+                {filteredP1Options.map((p) => <option key={p.id} value={p.fullname} />)}
+              </datalist>
+              <datalist id="players-list-p2">
+                {filteredP2Options.map((p) => <option key={p.id} value={p.fullname} />)}
               </datalist>
 
               {/* Advanced Insights Grid */}
-              <div className="bento-grid">
-                <div className="heatmap-card">
-                  <div className="heatmap-header">
-                    <h4>Impact Heatmap</h4>
-                    <span className="badge-timer">
-                      Analysis Index: {((parseInt(p1?.id || 0) + parseInt(p2?.id || 0)) % 100).toFixed(0)}% Match
-                    </span>
-                  </div>
-                  <div className="heatmap-content">
-                    {/* Dynamic Digital Grid Visualization */}
-                    <div className="heatmap-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '8px', padding: '24px' }}>
-                      {[...Array(72)].map((_, i) => {
-                        const seed = (parseInt(p1?.id || 0) * (i + 1) + parseInt(p2?.id || 0) * (i + 3)) % 100;
-                        const isHot = seed > 85;
-                        return (
-                          <div 
-                            key={i} 
-                            style={{
-                              height: '8px', width: '8px', borderRadius: '50%',
-                              backgroundColor: isHot ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
-                              boxShadow: isHot ? '0 0 12px var(--primary)' : 'none'
-                            }}
-                          ></div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="side-cards">
-                  {(() => {
-                    const sr1 = parseFloat(p1.career?.[0]?.batting?.strike_rate || 135);
-                    const sr2 = parseFloat(p2.career?.[0]?.batting?.strike_rate || 142);
-                    const srLeader = sr1 >= sr2 ? p1 : p2;
-                    
-                    const avg1 = parseFloat(p1.career?.[0]?.batting?.average || 35);
-                    const avg2 = parseFloat(p2.career?.[0]?.batting?.average || 42);
-                    const avgLeader = avg1 >= avg2 ? p1 : p2;
-
-                    return (
-                      <>
-                        <div className="summary-card">
-                          <div className="summary-header">
-                            <span className="material-symbols-outlined">electric_bolt</span>
-                            <span className="scout-pick">Scout Pick</span>
-                          </div>
-                          <h5>{srLeader.lastname} leads in Power Impact.</h5>
-                          <p className="summary-desc">Analyzing recent delivery trajectories, {srLeader.lastname} maintains a {Math.max(sr1, sr2)} S/R advantage in powerplay scenarios.</p>
-                        </div>
-                        <div className="consistency-card">
-                          <div className="consistency-header">
-                            <span className="material-symbols-outlined">trending_up</span>
-                            <div>
-                               <p>Consistency Index</p>
-                               <p>{avgLeader.lastname} +{getPercentDiff(avg1, avg2)}%</p>
-                            </div>
-                          </div>
-                          <p className="consistency-desc">{avgLeader.lastname} exhibits superior technical average stability across match formats.</p>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </div>
-              </div>
+              <InsightsGrid p1={p1} p2={p2} />
             </>
           )}
         </section>
@@ -248,3 +240,90 @@ export default function ComparePage({ isMobileMenuOpen }) {
     </div>
   );
 }
+
+ComparePage.propTypes = {
+  isMobileMenuOpen: PropTypes.bool,
+};
+
+/**
+ * Extracted Insights Grid component.
+ * Replaces the IIFE that was inside JSX — a pattern that hurts readability
+ * and makes it impossible to apply React optimizations like memo.
+ */
+function InsightsGrid({ p1, p2 }) {
+  const t1 = getTotalCareerStats(p1.career);
+  const t2 = getTotalCareerStats(p2.career);
+
+  const sr1 = t1.strikeRate;
+  const sr2 = t2.strikeRate;
+  const srLeader = sr1 >= sr2 ? p1 : p2;
+
+  const avg1 = t1.average;
+  const avg2 = t2.average;
+  const avgLeader = avg1 >= avg2 ? p1 : p2;
+
+  return (
+    <div className="bento-grid">
+      <div className="heatmap-card">
+        <div className="heatmap-header">
+          <h4>Impact Heatmap</h4>
+          <span className="badge-timer">
+            Analysis Index: {((parseInt(p1?.id || 0) + parseInt(p2?.id || 0)) % 100).toFixed(0)}% Match
+          </span>
+        </div>
+        <div className="heatmap-content">
+          <div className="heatmap-grid compare-heatmap-grid">
+            {[...Array(72)].map((_, i) => {
+              const seed = (parseInt(p1?.id || 0) * (i + 1) + parseInt(p2?.id || 0) * (i + 3)) % 100;
+              const isHot = seed > 85;
+              return (
+                <div
+                  key={i}
+                  className={`heatmap-dot ${isHot ? 'heatmap-dot-hot' : ''}`}
+                ></div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="side-cards">
+        <div className="summary-card">
+          <div className="summary-header">
+            <span className="material-symbols-outlined">electric_bolt</span>
+            <span className="scout-pick">Scout Pick</span>
+          </div>
+          <h5>{srLeader.lastname} leads in Power Impact.</h5>
+          <p className="summary-desc">
+            Analyzing recent delivery trajectories, {srLeader.lastname} maintains a {Math.max(sr1, sr2)} S/R advantage in powerplay scenarios.
+          </p>
+        </div>
+        <div className="consistency-card">
+          <div className="consistency-header">
+            <span className="material-symbols-outlined">trending_up</span>
+            <div>
+              <p>Consistency Index</p>
+              <p>{avgLeader.lastname} +{getPercentDiff(avg1, avg2)}%</p>
+            </div>
+          </div>
+          <p className="consistency-desc">
+            {avgLeader.lastname} exhibits superior technical average stability across match formats.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+InsightsGrid.propTypes = {
+  p1: PropTypes.shape({
+    id: PropTypes.number,
+    lastname: PropTypes.string,
+    career: PropTypes.array,
+  }).isRequired,
+  p2: PropTypes.shape({
+    id: PropTypes.number,
+    lastname: PropTypes.string,
+    career: PropTypes.array,
+  }).isRequired,
+};
