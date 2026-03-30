@@ -1,25 +1,41 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { FALLBACK_IMAGE, getFlagEmoji } from '../utils/helpers';
+import PropTypes from 'prop-types';
+import { FALLBACK_IMAGE, getFlagEmoji, getTotalCareerStats } from '../utils/helpers';
 
 /**
  * Scout Hub: Reusable Player Preview Card.
- * 
+ *
  * Used in the bento-grid roster view. Features glassmorphism effects,
  * automatic image fallbacks, and role-based stat labeling.
- * 
- * @param {Object} props.player The raw player data object from SportMonks.
- * @param {string} props.countryName Mapped country name for display.
+ *
+ * Wrapped with React.memo to prevent unnecessary re-renders when
+ * the parent list re-renders but this player's data hasn't changed.
  */
-export default function PlayerCard({ player, countryName }) {
+function PlayerCard({ player, countryName }) {
   const imgPath = player.image_path || FALLBACK_IMAGE;
 
-  // Mock derived stats based on role to demonstrate the design
   const isBowler = player.position?.name?.toLowerCase().includes('bowl');
   const tagStr = player.position?.name || 'Player';
 
-  const stat1 = isBowler ? { label: 'Wickets', value: '341' } : { label: 'Runs', value: '2420' };
-  const stat2 = isBowler ? { label: 'Avg', value: '27.5' } : { label: 'S/R', value: '145.2' };
-  const stat3 = isBowler ? { label: 'Speed', value: '151.2' } : { label: 'Catches', value: '118' };
+  // Grand total across all formats (T20I + ODI + Test + T20)
+  const total = getTotalCareerStats(player.career);
+
+  let stat1, stat2, stat3;
+
+  if (isBowler && total.wickets > 0) {
+    stat1 = { label: 'Matches', value: total.matches || '-' };
+    stat2 = { label: 'Wickets', value: total.wickets || '-' };
+    stat3 = { label: 'Runs', value: total.runs || '-' };
+  } else if (total.matches > 0) {
+    stat1 = { label: 'Matches', value: total.matches };
+    stat2 = { label: 'Runs', value: total.runs };
+    stat3 = { label: 'Avg', value: total.average };
+  } else {
+    stat1 = { label: 'Matches', value: '-' };
+    stat2 = { label: 'Runs', value: '-' };
+    stat3 = { label: 'Avg', value: '-' };
+  }
 
   return (
     <Link to={`/players/${player.id}`} className="player-card">
@@ -62,3 +78,23 @@ export default function PlayerCard({ player, countryName }) {
     </Link>
   );
 }
+
+PlayerCard.propTypes = {
+  player: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    fullname: PropTypes.string,
+    image_path: PropTypes.string,
+    position: PropTypes.shape({
+      name: PropTypes.string,
+    }),
+    career: PropTypes.arrayOf(
+      PropTypes.shape({
+        batting: PropTypes.object,
+        bowling: PropTypes.object,
+      })
+    ),
+  }).isRequired,
+  countryName: PropTypes.string,
+};
+
+export default memo(PlayerCard);

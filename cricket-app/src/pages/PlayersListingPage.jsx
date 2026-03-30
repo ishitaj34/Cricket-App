@@ -1,23 +1,18 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import PropTypes from 'prop-types';
 import { fetchPlayers, fetchCountries } from '../api/sportmonks';
 import PlayerCard from '../components/PlayerCard';
 import Loader from '../components/Loader';
+import useDebounce from '../hooks/useDebounce';
 
-function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-  return debouncedValue;
-}
-
+/**
+ * Scout Hub: Player Roster Listing Page.
+ *
+ * Displays the full scouting database with filters, sorting, search, and
+ * pagination. Sorting logic lives here because it only concerns this page.
+ */
 export default function PlayersListingPage({ isMobileMenuOpen }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
@@ -78,23 +73,27 @@ export default function PlayersListingPage({ isMobileMenuOpen }) {
     } else {
       params.delete(key);
     }
-
-    // Only reset to page 1 if we are changing a filter/search, not if we are specifically navigating pages.
     if (key !== 'page') {
       params.delete('page');
     }
-
     setSearchParams(params);
   };
 
-
   /**
-   * Processes the raw dataset based on four concurrent criteria:
-   * 1. Fuzzy Name Search (Local State)
-   * 2. Country/Team Filter (URL State)
-   * 3. Role/Position Filter (URL State)
-   * 4. Tournament/Format Filter (URL State - Requires nested career search)
+   * Toggles the sorting order (ASC/DESC) for a given player field in the URL.
+   * @param {string} field The player property to sort by (e.g., 'firstname').
    */
+  const toggleSort = (field) => {
+    const current = searchParams.get('sort');
+    const params = new URLSearchParams(searchParams);
+    if (current === `${field}_asc`) {
+      params.set('sort', `${field}_desc`);
+    } else {
+      params.set('sort', `${field}_asc`);
+    }
+    setSearchParams(params, { replace: true });
+  };
+
   const processedPlayers = useMemo(() => {
     let result = [...players];
     const q = searchParams.get('search')?.toLowerCase();
@@ -153,7 +152,7 @@ export default function PlayersListingPage({ isMobileMenuOpen }) {
       {/* SideNavBar / Filter Shell */}
       <aside className={`sidebar custom-scrollbar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-filters-container">
-          <h3 className="sidebar-title" style={{ padding: '0 24px', fontSize: '0.625rem' }}>Scout Hub Filters</h3>
+          <h3 className="sidebar-title sidebar-title-padded">Scout Hub Filters</h3>
           <div className="sidebar-filters">
             {/* Search Input */}
             <div className="filter-group">
@@ -241,7 +240,7 @@ export default function PlayersListingPage({ isMobileMenuOpen }) {
           <Link to="/compare" className="nav-item">
             <span className="material-symbols-outlined">compare_arrows</span> Head-to-Head
           </Link>
-          <div className="nav-item disabled" style={{ opacity: 0.3 }}>
+          <div className="nav-item disabled">
             <span className="material-symbols-outlined">analytics</span> Analytics (Soon)
           </div>
         </nav>
@@ -263,19 +262,30 @@ export default function PlayersListingPage({ isMobileMenuOpen }) {
             </p>
           </div>
 
-          <div className="sort-container">
-            <span className="sort-label">Sort By</span>
-            <select
-              value={activeSort}
-              onChange={(e) => handleFilterChange('sort', e.target.value)}
-              className="filter-select sort-select"
+          <div className="sort-actions">
+            {/* Sort toggle button */}
+            <button
+              title="Toggle Alphabetical Sort"
+              onClick={() => toggleSort('firstname')}
+              className="material-symbols-outlined icon-btn"
             >
-              <option value="firstname_asc">First Name (A-Z)</option>
-              <option value="firstname_desc">First Name (Z-A)</option>
-              <option value="id_asc">ID (Low to High)</option>
-              <option value="id_desc">ID (High to Low)</option>
-              <option value="updatedAt_desc">Recently Updated</option>
-            </select>
+              sort_by_alpha
+            </button>
+
+            <div className="sort-container">
+              <span className="sort-label">Sort By</span>
+              <select
+                value={activeSort}
+                onChange={(e) => handleFilterChange('sort', e.target.value)}
+                className="filter-select sort-select"
+              >
+                <option value="firstname_asc">First Name (A-Z)</option>
+                <option value="firstname_desc">First Name (Z-A)</option>
+                <option value="id_asc">ID (Low to High)</option>
+                <option value="id_desc">ID (High to Low)</option>
+                <option value="updatedAt_desc">Recently Updated</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -343,3 +353,7 @@ export default function PlayersListingPage({ isMobileMenuOpen }) {
     </div>
   );
 }
+
+PlayersListingPage.propTypes = {
+  isMobileMenuOpen: PropTypes.bool,
+};
